@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:1.14.0
+    command: nginx -g "daemon off;"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/var/log/nginx:/var/log/nginx
+    working_dir: /var/www/html
+    links:
+      - php
+    ports:
+      - "${NGINX_PORT_HOST_HTTP}:80"
+      - "${NGINX_PORT_HOST_HTTPS}:443"
+    networks:
+      - internal
+
+  php:
+    container_name: php-fpm-likes
+    build: docker/php-fpm
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html/
+    command: ["php-fpm"]
+    links:
+      - db
+      - cache
+    environment:
+      XDEBUG_CONFIG: "remote_host=${SUBNET_IP} remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=likes"
+    networks:
+      - internal
+
+  db:
+    image: postgres:12.1
+    volumes:
+      - ./docker/var/lib/postgresql/data/pgdata:/var/lib/postgresql/data/pgdata
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - internal
+
+  cache:
+    image: memcached
+    networks:
+      - internal
+
+  adminer:
+    container_name: adminer-likes
+    restart: always
+    image: adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: ${POSTGRES_HOST}
+    ports:
+      - "${ADMINER_PORT}:8080"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET_IP}/24
