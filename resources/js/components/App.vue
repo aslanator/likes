@@ -45,9 +45,14 @@
         methods : {
             setDefaults() {
                 if (this.isLoggedIn) {
-                    let user = JSON.parse(localStorage.getItem('likes.user'));
-                    this.name = user.name;
-                    this.user_type = user.is_admin;
+                    try{
+                        let user = JSON.parse(localStorage.getItem('likes.user'));
+                        this.name = user.name;
+                        this.user_type = user.is_admin;
+                    }
+                    catch{
+                        this.isLoggedIn = false
+                    }
                 }
             },
             change() {
