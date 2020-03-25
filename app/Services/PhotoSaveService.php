@@ -27,8 +27,10 @@ class PhotoSaveService
                 $data = ['url' => $url];
                 if ($this->photo->exists)
                     $this->photo->update($data);
-                else
+                else{
                     $this->photo = Photo::create($data);
+                    $this->photo->url = $url;
+                }
                 return true;
             } catch (\Exception $exception) {
                 $this->error = $exception->getMessage();
@@ -42,4 +44,13 @@ class PhotoSaveService
     {
         return $this->error;
     }
+
+    /**
+     * @return Photo
+     */
+    public function getPhoto(): Photo
+    {
+        return $this->photo;
+    }
+
 }

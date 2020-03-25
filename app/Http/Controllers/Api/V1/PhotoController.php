@@ -104,7 +104,7 @@ class PhotoController extends Controller
             $photo            = $id ? Photo::findOrFail($id) : new Photo();
             $photoSaveService = new PhotoSaveService($photo);
             if ($photoSaveService->save($file))
-                return $photo;
+                return $photoSaveService->getPhoto();
             abort(Response::HTTP_INTERNAL_SERVER_ERROR, $photoSaveService->getError());
         }
         abort(Response::HTTP_BAD_REQUEST, 'Photo not uploaded');
