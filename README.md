@@ -8,5 +8,5 @@
 ./docker/bin/passport.sh     
 
 
-По умолчанию программа запускается на localhost:8090  
+По умолчанию программа запускается на localhost:8090  (порт меняется в env)
 Логин: test@test.com Пароль: secret
